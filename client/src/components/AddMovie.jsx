@@ -1,8 +1,5 @@
 import React from 'react';
 
-// // input and submit button
-// // add input value to movie list as object
-// // Display only user added movies, not the hardcoded data.
 
 class AddMovie extends React.Component {
   constructor(props) {

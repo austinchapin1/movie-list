@@ -21,20 +21,36 @@ class SearchBar extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     this.props.search(this.state.value);
-    // Why does this work with setState?
-    this.state.value = '';
 
-    // this.setState({
-    //   value: ''
-    // })
+    this.setState({
+      value: ''
+    })
   }
 
   render () {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Search.." value={this.state.value} onChange={this.handleChange} />
-        <button type="submit">Go!</button>
-      </form>
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <input type="text" placeholder="Search.." value={this.state.value} onChange={this.handleChange} />
+          <button type="submit" onSubmit={this.handleSubmit}>Go!</button>
+        </form>
+
+        {/* Need to have two different buttons
+              -One to select only watched movies
+              -One to select only unwatched movie
+
+              After search list has been collected, show all?
+              Click on watch,
+        */}
+
+        {/* <button className="btn" onClick={this.toggleWatch.bind(this)}>
+          {this.state.isToggleOn ? 'Have to See!' : 'Watched'}
+        </button>
+        <button className="btn" onClick={this.toggleWatch.bind(this)}>
+          {this.state.isToggleOn ? 'Have to See!' : 'Watched'}
+        </button> */}
+
+      </div>
     )
   }
 }

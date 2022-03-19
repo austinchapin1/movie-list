@@ -4,6 +4,7 @@ import Movie from './Movie.jsx';
 import SearchBar from './SearchBar.jsx';
 import AddMovie from './AddMovie.jsx';
 import ExampleData from './ExampleData.js';
+import WatchedButtons from './WatchedButtons.jsx'
 
 
 class App extends React.Component {
@@ -11,51 +12,96 @@ class App extends React.Component {
     super(props)
 
     this.state = {
-      allMovies: [],
-      movieList: []
+      unwatchedMovies: [],
+      watchedMovies: [],
+      movieList: [],
     }
+
 
     this.search = this.search.bind(this);
     this.addMovie = this.addMovie.bind(this);
-    this.toggleWatched = this.toggleWatched.bind(this);
+    this.toggleWatch = this.toggleWatch.bind(this);
+    this.toggleMovies = this.toggleMovies.bind(this);
   }
 
-  search (searchValue) {
 
-    var searchList = this.state.allMovies.filter( movie => {
+  search (searchValue) {
+    var allMovies = [...this.state.unwatchedMovies, ...this.state.watchedMovies];
+    // Filter allMovies, return list of titles that include what is current in input val
+    var searchList = allMovies.filter( movie => {
       return movie.title.toLowerCase().includes(searchValue)
      })
-
+    // Set State to filtered list, re-render
     this.setState({
       movieList: searchList.length ? searchList : [{title: 'Sorry, nothing by that title'}]
     })
-
-    console.log(searchList)
   }
 
 
 
   addMovie (movieName) {
-    // check if movie exists, if so dont add it
-    // this.state.allMovies.
-    // if (this.state.allMovies) {}
-    var movieObj = {title: movieName};
-
-    var temp = this.state.allMovies;
-
-    temp.push(movieObj);
+    // Don't allow multiples of movie names
+    // Filter through ALL movies, watched and unwatched
+    var allMovies = [...this.state.unwatchedMovies, ...this.state.watchedMovies];
+    allMovies.forEach( movie => {
+      if (movie.title.toLowerCase().includes(movieName.toLowerCase())) {
+        alert(`${movieName} already exists!`)
+      }
+    })
+    // Create movie object, add to list, update state
+    var movieObj = {title: movieName, toggleWatch: true};
+    var movieAdded = [...this.state.unwatchedMovies, movieObj];
 
     this.setState({
-      allMovies: temp
+      unwatchedMovies: movieAdded,
+      movieList: movieAdded
     })
   }
 
-  toggleWatched () {
-    console.log('hello')
-    this.setState(prevState => ({
-      isToggleOn: !prevState.isToggleOn
-    }));
+
+
+
+
+// INDIVIDUAL MOVIE TOGGLE
+  toggleWatch(idx) {
+    var movieObj = this.state.movieList[idx];
+
+    movieObj.toggleWatch = !movieObj.toggleWatch;
+
+    if (!movieObj.toggleWatch) {
+      var filtered = this.state.unwatchedMovies.filter( movie => {
+        return movie.title !== movieObj.title;
+      })
+      console.log(filtered);
+      this.setState({
+        unwatchedMovies: filtered,
+        watchedMovies: [...this.state.watchedMovies, movieObj]
+      })
+    } else {
+      var filtered = this.state.watchedMovies.filter( movie => {
+        return movie.title !== movieObj.title
+      })
+      this.setState({
+        unwatchedMovies: [...this.state.unwatchedMovies, movieObj],
+        watchedMovies: filtered
+      })
+    }
   }
+
+
+// LIST OF MOVIES TOGGLE
+  toggleMovies (predicate) {
+    if (predicate) {
+      this.setState({
+        movieList: this.state.unwatchedMovies
+      })
+    } else {
+      this.setState({
+        movieList: this.state.watchedMovies
+      })
+    }
+  }
+
 
 
   render() {
@@ -66,29 +112,13 @@ class App extends React.Component {
         <br/>
         <SearchBar search={this.search}/>
         <br/>
-        <MovieList movies={this.state.movieList} watched={this.toggleWatched.bind(this)}/>
+        <WatchedButtons toggleMovies={this.toggleMovies}/>
+        <br/>
+        <MovieList movies={this.state.movieList} toggle={this.toggleWatch}/>
       </div>
     );
   }
 }
 
 
-
-
-// use input from onSubmit to
-// .filter movieList with .contains searchtext?
-//  On submit - take value for event.target.value
-// loop over MoviesList and check if title contains searchvalue
-// if it does, add to movieList - before invoking setState so as to only rerender once
-
-// handleSubmit() {
-
-//   // value = event.target.value;
-//   // alert(this.state.value)
-//   event.preventDefault();
-
-//   this.setState({
-//     movieList: videos
-//   })
-// }
 export default App;
